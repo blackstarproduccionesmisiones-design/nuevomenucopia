@@ -11,7 +11,7 @@
         /* Banner del Local */
         .banner { background: #2c3e50; color: white; padding: 30px 20px; text-align: center; }
         .banner h1 { margin: 0; font-size: 2rem; color: #fff; }
-        .banner-img { max-width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-top: 15px; display: none; }
+        .banner-img { max-width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-top: 15px; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
 
         /* Video Promocional */
         .video-container { max-width: 800px; margin: 20px auto; padding: 0 15px; text-align: center; }
@@ -48,7 +48,7 @@
 </head>
 <body>
 
-    <!-- 1. Banner Principal con Nombre y Portada Dinámicos -->
+    <!-- 1. Banner Principal con Nombre y Portada -->
     <div class="banner">
         <h1 id="nombre-local">Cargando local...</h1>
         <p>¡Hacé tu pedido online por WhatsApp!</p>
@@ -81,7 +81,7 @@
         <img id="img-ampliada" src="" alt="Imagen ampliada">
     </div>
 
-    <!-- Modal Checkout (Datos de Cliente) -->
+    <!-- Modal Checkout -->
     <div id="modal-checkout">
         <div class="modal-content">
             <h3>Finalizar Pedido</h3>
@@ -101,13 +101,13 @@
         fetch(URL_APPS_SCRIPT)
             .then(response => response.json())
             .then(data => {
-                // Cargar ajustes (Nombre del local y Portada)
                 if (data.ajustes) {
-                    const nombreLocal = data.ajustes.nombre || data.ajustes.Nombre_Local || Object.values(data.ajustes)[0] || "Mi Menú Digital";
+                    // Lee exactamente NOMBRE_LOCAL de tu hoja
+                    const nombreLocal = data.ajustes.NOMBRE_LOCAL || "Mi Menú Digital";
                     document.getElementById('nombre-local').innerText = nombreLocal;
 
-                    // Si tienes una clave para la portada en ajustes (por ejemplo 'portada' o 'imagen_portada')
-                    const portadaUrl = data.ajustes.portada || data.ajustes.imagen_portada || data.ajustes.Portada;
+                    // Lee exactamente IMAGEN_PORTADA de tu hoja
+                    const portadaUrl = data.ajustes.IMAGEN_PORTADA;
                     if (portadaUrl) {
                         const bannerImg = document.getElementById('banner-img');
                         bannerImg.src = portadaUrl;
@@ -215,13 +215,12 @@
                 return;
             }
 
-            // 1. Guardar cliente automáticamente en Google Sheets (vía POST)
+            // Registrar cliente automáticamente en la solapa Clientes
             fetch(URL_APPS_SCRIPT, {
                 method: 'POST',
                 body: JSON.stringify({ nombre: nombre, telefono: telefono })
             }).catch(err => console.log('Error registrando cliente:', err));
 
-            // 2. Armar mensaje de WhatsApp
             let mensaje = `*¡Nuevo Pedido!*%0A%0A*Cliente:* ${nombre}%0A*Teléfono:* ${telefono}%0A%0A*Detalle del pedido:*%0A`;
             let total = 0;
 
